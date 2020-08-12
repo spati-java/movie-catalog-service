@@ -22,6 +22,11 @@ public class MovieCatalogResource {
     @Autowired
     RestTemplate restTemplate;
 
+    @GetMapping("/test")
+    public String test(){
+        return "Catalog Service Working !";
+    }
+
     @GetMapping("/{userId}")
     public List<CatalogItem> getCatalog(@PathVariable("userId")  String userId){
         List<Rating> ratings = Arrays.asList(
@@ -30,7 +35,7 @@ public class MovieCatalogResource {
 
         return ratings.stream()
                 .map(rating-> {
-                    Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
+                    Movie movie = restTemplate.getForObject("http://movie-info-service:8082/movies/" + rating.getMovieId(), Movie.class);
                     return new CatalogItem(movie.getName(), "", rating.getRating());
                 } ).collect(Collectors.toList());
 

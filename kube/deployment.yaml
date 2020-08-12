@@ -1,0 +1,27 @@
+# ... Deployment YAML definition
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: movie-catalog-service
+  name: movie-catalog-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-catalog-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: movie-catalog-service
+    spec:
+      containers:
+      - image: spati/movie-catalog-service:test1
+        name: movie-catalog-service
+        ports:
+         - containerPort: 8081
+        resources: {}
+status: {}
