@@ -19,7 +19,7 @@ spec:
         app: movie-catalog-service
     spec:
       containers:
-      - image: spati/movie-catalog-service:ratings
+      - image: spati/movie-catalog-service:fallback-fixv3
         name: movie-catalog-service
         ports:
          - containerPort: 8081

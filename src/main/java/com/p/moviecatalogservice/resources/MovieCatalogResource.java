@@ -1,14 +1,16 @@
 package com.p.moviecatalogservice.resources;
 
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.p.moviecatalogservice.model.*;
+import com.p.moviecatalogservice.services.MovieInfo;
+import com.p.moviecatalogservice.services.UserRatingInfo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,28 +19,27 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/catalog")
 @Slf4j
+@RequiredArgsConstructor
 public class MovieCatalogResource {
 
-    @Autowired
-    RestTemplate restTemplate;
+    private final MovieInfo movieInfo;
+
+    private final UserRatingInfo userRatingInfo;
 
     @GetMapping("/test")
-    public String test(){
+    public String test() {
         return "Catalog Service Working !";
     }
 
     @GetMapping("/{userId}")
-    public List<CatalogItem> getCatalog(@PathVariable("userId")  String userId) {
+    public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
 
-        UserRating userRating = restTemplate.getForObject( "http://movie-rating-service:8083/ratings/" + "movieId", UserRating.class);
-
-        System.out.println(userRating.getRatings());
-
-        return userRating.getRatings().stream().map(rating -> {
-            Movie movie = restTemplate.getForObject("http://movie-info-service:8082/movies/"+rating.getMovieId(), Movie.class);
-            return new CatalogItem(movie.getName(), movie.getDescription(),rating.getRating());
-        }).collect(Collectors.toList());
-
+        return userRatingInfo.getUserRating(userId).getRatings()
+                .stream()
+                .map(rating -> movieInfo.getCatalogItem(rating))
+                .collect(Collectors.toList());
 
     }
+
+
 }
